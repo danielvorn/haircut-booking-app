@@ -1,0 +1,19 @@
+version: "3.4"
+services:
+  myapp:
+    container_name: haircut-app-docker
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PORT = ${PORT}
+    ports:
+      - 3000:${PORT}
+    env_file:
+      - .env
+    volumes:
+      - ./:/usr/local/apps/myapp/dev
+      - ignore:/usr/local/apps/myapp/dev/node_modules/
+volumes:
+  ignore:
