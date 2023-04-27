@@ -6,6 +6,7 @@ RUN npm install && npm cache clean --force
 
 COPY tsconfig.json ./
 
+COPY .env ./
 COPY src ./src
 
 EXPOSE ${PORT}
