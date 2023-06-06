@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    // lib - this option specifies which libraries we want TypeScript to support
+    "lib": ["dom", "es2015"],
+    // outDir - this options tells the TS compiler where to export the compiled code
+    "outDir": "./lib/cjs/",
+    // sourceMap - enables source maps to be generated
+    "sourceMap": true,
+    // declaration - generates declaration files after compiling if true
+    "declaration": true,
+    // noImplicitAny - prevents using the any type by throwing an error (this is best practice)
+    "noImplicitAny": true,
+    // module - specifies the module system to use when generating JS code from the TypeScript source code
+    "module": "commonjs",
+    // target - specifies the JavaScript version to which the TypeScript code should be transpiled
+    "target": "es5",
+    // allowJs - specifies whether the compiler should include JS files in the project
+    "allowJs": true,
+    // moduleResolution - specifies the strategy that the compiler should use to resolve module names
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  // include - specifies which are the source files TypeScript should compile
+  "include": ["src/**/*.ts*"],
+  // exclude - specifies which folders should TypeScript ignore when compiling
+  "exclude": ["node_modules", "dist", "lib"]
+}

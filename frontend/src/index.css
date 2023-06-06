@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+@layer components {
+  .paragraph {
+    --tw-text-opacity: 1;
+    color: rgb(55 65 81 / var(--tw-text-opacity));
+  }
+}
+
+@layer components {
+  .color-primary {
+    @apply bg-neutral-100 dark:bg-neutral-800;
+  }
+  .color-background {
+    @apply bg-neutral-200 dark:bg-dark-primary/90;
+  }
+  .color-secondary {
+    @apply bg-neutral-100 dark:bg-dark-primary/80;
+  }
+  .color-accent {
+    @apply bg-neutral-700 text-neutral-100 dark:bg-neutral-900;
+  }
+  .color-component-primary {
+    @apply text-neutral-200 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-200;
+  }
+  .color-component-secondary {
+    @apply text-light-heading bg-neutral-100 dark:bg-neutral-600 dark:text-neutral-50;
+  }
+  .color-heading {
+    @apply text-neutral-950 dark:text-neutral-100;
+  }
+  .color-paragraph {
+    @apply text-neutral-700 dark:text-neutral-200;
+  }
+  .color-hover {
+    @apply hover:bg-neutral-600 hover:text-neutral-50 dark:hover:bg-neutral-100 dark:hover:text-neutral-700;
+  }
+  .color-border {
+    @apply border border-neutral-400 dark:border-neutral-600;
+  }
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+select option {
+  background-color: white;
+  color: #4a5568;
+  padding: 0.75rem;
+}
+
+select option:hover {
+  background-color: #f7fafc;
+  color: #1a202c;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+label,
+p {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+/* Hide the scrollbar */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Make autofill input white on Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}
