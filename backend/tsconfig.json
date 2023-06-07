@@ -3,7 +3,7 @@
     // lib - this option specifies which libraries we want TypeScript to support
     "lib": ["dom", "es2015"],
     // outDir - this options tells the TS compiler where to export the compiled code
-    "outDir": "./lib/cjs/",
+    "outDir": "./dist",
     // sourceMap - enables source maps to be generated
     "sourceMap": true,
     // declaration - generates declaration files after compiling if true
