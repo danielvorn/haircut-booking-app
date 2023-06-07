@@ -72,7 +72,10 @@ router.get(
         profilePicture: user.google.profilePicture,
       }
 
-      res.cookie("token", generateAccessToken(payload), { httpOnly: true })
+      res.cookie("token", generateAccessToken(payload), {
+        httpOnly: true,
+        secure: true,
+      })
 
       // Redirect to the frontend callback route
       res.redirect(`${FRONTEND_URL}/redirect`)
@@ -99,6 +102,7 @@ router.post(
 
       res.cookie("token", generateAccessToken(payload), {
         httpOnly: true,
+        secure: true,
       })
 
       res.status(201).json("Login successful")
