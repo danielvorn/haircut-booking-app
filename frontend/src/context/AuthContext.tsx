@@ -1,19 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import type React from 'react'
-import { createContext, useState, type PropsWithChildren } from 'react'
+import { createContext, type PropsWithChildren } from 'react'
 import axiosInstance from '../utils/api'
 
 interface AuthState {
   isAuthenticated: boolean
   data: {
-    displayName: string
-    email: string
-    exp: number
-    googleId: string
-    iat: number
-    profilePicture: string
+    displayName?: string
+    email?: string
+    exp?: number
+    googleId?: string
+    iat?: number
+    profilePicture?: string
     role: string
-    userId: string
+    userId?: string
+    username?: string
   } | null
   reason: string | null
 }

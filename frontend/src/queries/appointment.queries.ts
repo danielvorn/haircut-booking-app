@@ -32,7 +32,7 @@ function getAppointmentsHistory(userId: string, navigate: NavigateFunction) {
         }
       })
       return res.data
-    } catch (error) {
+    } catch (error: any) {
       if (error.response.status === 400 || error.response.status === 401) {
         navigate('/login')
       }
@@ -50,7 +50,7 @@ function getUpcomingAppointments(userId: string, navigate: NavigateFunction) {
         }
       })
       return res.data
-    } catch (error) {
+    } catch (error: any) {
       if (error.response.status === 400 || error.response.status === 401) {
         navigate('/login')
       }

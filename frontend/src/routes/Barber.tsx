@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import FakeImage from '../components/FakeImage'
 import ListComponent from '../components/ListItem'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { useGetBarbers } from '../queries/barber.queries'
+import { type IBarber, useGetBarbers } from '../queries/barber.queries'
 import useAppointmentStore from '../store/useAppointmentStore'
 
 export default function Barber() {
@@ -10,13 +10,13 @@ export default function Barber() {
   const { service, date } = appointment
   const extractedDate = date !== null ? date?.split('T')[0] : new Date().toISOString()
   const duration = service?.duration ?? 60
-  const { data: barbers } = useGetBarbers()
+  const { data: barbers, isLoading } = useGetBarbers()
 
-  const renderBarbers = (barber: typeof barbers, index: number): JSX.Element => {
-    if (!barber) {
-      return <LoadingSpinner />
-    }
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
 
+  const renderBarbers = (barber: IBarber) => {
     return (
       <NavLink
         to={`/slots/barber/${barber._id}/date/${extractedDate as string}/duration/${duration}`}
@@ -38,7 +38,7 @@ export default function Barber() {
 
   return (
     <ListComponent
-      items={barbers}
+      items={barbers ?? []}
       renderListItem={renderBarbers}
       filterFields={{ name: 'string' }}
     />

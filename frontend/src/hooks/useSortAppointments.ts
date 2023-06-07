@@ -1,21 +1,32 @@
 import { useEffect, useState } from 'react'
+import { type Appointment } from '../routes/Appointments'
 
-const useSortedAppointments = (flatAppointments) => {
-  const [sortedAppointments, setSortedAppointments] = useState(flatAppointments)
+type SortByAscending = () => void
+type SortByDescending = () => void
 
-  const sortAppointmentsByStartTime = (appointments, ascending) => {
+const useSortedAppointments = (
+  flatAppointments: Appointment[]
+): [Appointment[], SortByAscending, SortByDescending] => {
+  const [sortedAppointments, setSortedAppointments] = useState<Appointment[]>(flatAppointments)
+
+  const sortAppointmentsByStartTime = (
+    appointments: Appointment[],
+    ascending: boolean
+  ): Appointment[] => {
     const sorted = [...appointments].sort(
-      (a, b) => (ascending ? 1 : -1) * (new Date(a.slot.startTime) - new Date(b.slot.startTime))
+      (a, b) =>
+        ((ascending ? 1 : -1) as any) *
+        ((new Date(a.slot.startTime) as any) - (new Date(b.slot.startTime) as any))
     )
     return sorted
   }
 
-  const sortByAscending = () => {
+  const sortByAscending: SortByAscending = () => {
     const sorted = sortAppointmentsByStartTime(sortedAppointments, true)
     setSortedAppointments(sorted)
   }
 
-  const sortByDescending = () => {
+  const sortByDescending: SortByDescending = () => {
     const sorted = sortAppointmentsByStartTime(sortedAppointments, false)
     setSortedAppointments(sorted)
   }

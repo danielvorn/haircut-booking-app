@@ -7,24 +7,23 @@ import useAppointmentStore from '../store/useAppointmentStore'
 const Calendar: React.FC = () => {
   const appointment = useAppointmentStore()
   const navigate = useNavigate()
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState<Date>(new Date())
 
   const handlePreviousMonth = () => {
-    setCurrentDate((prevDate) => {
+    setCurrentDate((prevDate: Date) => {
       const prevMonth = prevDate.getMonth() - 1
       return new Date(prevDate.getFullYear(), prevMonth, 1)
     })
   }
 
   const handleNextMonth = () => {
-    setCurrentDate((prevDate) => {
+    setCurrentDate((prevDate: Date) => {
       const nextMonth = prevDate.getMonth() + 1
       return new Date(prevDate.getFullYear(), nextMonth, 1)
     })
   }
 
   const handleDayClick = (date: Date) => {
-    // add one day to offset UTC hours
     const selectedDay = new Date(date.setDate(date.getDate() + 1)).toISOString()
     const extractedDate =
       selectedDay !== null ? selectedDay?.split('T')[0] : new Date().toISOString()
@@ -33,7 +32,7 @@ const Calendar: React.FC = () => {
     navigate('/barbers')
   }
 
-  const getWeekdaysRow = () => {
+  const getWeekdaysRow = (): React.ReactElement[] => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     return weekDays.map((day) => (
       <div key={day} className="calendar-cell calendar-header text-sm font-medium text-paragraph">
@@ -42,16 +41,16 @@ const Calendar: React.FC = () => {
     ))
   }
 
-  const getEmptyCells = (count: number) => {
+  const getEmptyCells = (count: number): React.ReactElement[] => {
     return Array.from({ length: count }).map((_, index) => (
       <div key={`empty-${index}`} className="calendar-cell empty-day" />
     ))
   }
 
-  const isDateDisabled = (date: Date) => {
+  const isDateDisabled = (date: Date): boolean => {
     const today = new Date()
 
-    if (date < new Date().setHours(0, 0, 0, 0)) {
+    if (date.getTime() < new Date(today.setHours(0, 0, 0, 0)).getTime()) {
       return true // Disable dates before today
     }
 
@@ -62,11 +61,11 @@ const Calendar: React.FC = () => {
     return false // Enable other dates
   }
 
-  const getDayClass = (isDisabled: boolean) => {
+  const getDayClass = (isDisabled: boolean): string => {
     return isDisabled ? 'disabled-day text-gray-500 cursor-default' : 'active-day cursor-pointer'
   }
 
-  const isDateToday = (date: Date, year: number, month: number) => {
+  const isDateToday = (date: Date, year: number, month: number): boolean => {
     const today = new Date()
     return (
       date.getDate() === today.getDate() &&
@@ -75,15 +74,15 @@ const Calendar: React.FC = () => {
     )
   }
 
-  const getCalendarDays = () => {
+  const getCalendarDays = (): React.ReactElement[] => {
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
     const daysInMonth = new Date(year, month + 1, 0).getDate()
     const firstDayIndex = new Date(year, month, 1).getDay()
 
-    const days: JSX.Element[] = []
+    const days: React.ReactElement[] = []
 
-    days.push(getWeekdaysRow())
+    days.push(...getWeekdaysRow())
     days.push(...getEmptyCells(firstDayIndex))
 
     for (let day = 1; day <= daysInMonth; day++) {

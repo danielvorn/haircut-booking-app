@@ -3,11 +3,11 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { TbBookmark, TbLogin, TbLogout, TbMenu2, TbPencil, TbUserCircle } from 'react-icons/tb'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
-import axiosInstance from '../utils/api'
 import { queryClient } from '../hooks/useQueryClient'
 import useAppointmentStore from '../store/useAppointmentStore'
+import axiosInstance from '../utils/api'
 
-const MenuItem: React.FC<{ onClick?: () => void; icon: JSX.Element; text: string }> = ({
+const MenuItem: React.FC<{ onClick?: () => Promise<void>; icon: JSX.Element; text: string }> = ({
   onClick,
   icon,
   text
@@ -36,11 +36,15 @@ const Menu: React.FC<{ isAuthenticated: boolean }> = () => {
   }
 
   const handleLogout = async () => {
-    await axiosInstance.post(`/auth/logout`)
-    queryClient.clear()
-    reset()
-    navigate('/')
-    window.location.reload()
+    try {
+      await axiosInstance.post(`/auth/logout`)
+      queryClient.clear()
+      reset()
+      navigate('/')
+      window.location.reload()
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   useEffect(() => {

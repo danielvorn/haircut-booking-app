@@ -10,7 +10,7 @@ interface Credentials {
 }
 
 const Login: React.FC = () => {
-  const { mutate: loginUser, isLoading, isError, error } = useLoginMutation()
+  const { mutate: loginUser, isLoading, error } = useLoginMutation()
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -54,11 +54,13 @@ const Login: React.FC = () => {
                 placeholder="Password"
               />
             </div>
-            {error && (
-              <div className="flex justify-start text-sm">
-                <p className="text-red-400">Wrong Username or Password</p>
-              </div>
-            )}
+            <>
+              {error && (
+                <div className="flex justify-start text-sm">
+                  <p className="text-red-400">Wrong Username or Password</p>
+                </div>
+              )}
+            </>
           </div>
           <button
             type="submit"

@@ -5,6 +5,7 @@
   "extends": "@tsconfig/vite-react/tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
+    "types": ["vite/client"],
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,

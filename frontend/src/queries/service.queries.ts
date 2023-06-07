@@ -1,6 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import axiosInstance from '../utils/api'
-import { type Service } from '../store/useAppointmentStore'
+
+export interface IService {
+  [key: string]: unknown
+  _id: string
+  name: string
+  description: string
+  price: number
+  duration: number
+  barbers: string[]
+  __v: number
+}
 
 const getServices = async () => {
   const { data } = await axiosInstance.get(`/services/`)
@@ -8,7 +18,7 @@ const getServices = async () => {
 }
 
 const useGetServices = () => {
-  return useQuery<Service>({
+  return useQuery<unknown, unknown, IService[]>({
     queryKey: ['services'],
     queryFn: getServices
   })

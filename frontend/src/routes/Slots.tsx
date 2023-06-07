@@ -11,16 +11,22 @@ interface TimeSlot {
   isAvailable: boolean
 }
 
+interface Params {
+  [key: string]: string | undefined
+  barberId: string
+  date: string
+  duration: string
+}
 export default function Slots() {
   const appointment = useAppointmentStore()
   const { service } = appointment
-  const params = useParams()
-  const { barberId, date: queryParamDate, duration } = params
-  const { data: slots } = useAppointmentSlotsAvailability({ barberId, queryParamDate, duration })
+  const params = useParams<Params>()
+  const { barberId = '', date = '', duration = '' } = params
+  const { data: slots } = useAppointmentSlotsAvailability({ barberId, date, duration })
 
-  const getFilteredSlots = (startHour: number, endHour: number) => {
+  const getFilteredSlots = (startHour: number, endHour: number): TimeSlot[] | undefined => {
     if (slots) {
-      return slots?.filter((slot) => {
+      return slots?.filter((slot: TimeSlot) => {
         const slotTime = new Date(slot.startTime).getHours()
         const endTime = new Date(slot.startTime).getHours()
         return slotTime >= startHour && endTime <= endHour
@@ -60,7 +66,9 @@ export default function Slots() {
         </div>
         <div className="flex items-center space-x-1">
           <TbClock />
-          <span className="text-sm font-light">{formatDuration(service?.duration)}</span>
+          <span className="text-sm font-light">
+            {service?.duration && formatDuration(service.duration)}
+          </span>
         </div>
       </div>
     )

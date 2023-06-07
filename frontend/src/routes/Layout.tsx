@@ -2,10 +2,9 @@ import { type QueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { DarkModeContext } from '../context/DarkModeContext'
-import { SERVER_URL } from '../secrets'
+import axiosInstance from '../utils/api'
 import Header from './Header'
 import Sidebar from './Sidebar'
-import axiosInstance from '../utils/api'
 
 export interface IAuthStatus {
   isAuthenticated: boolean
@@ -27,7 +26,7 @@ export const getAuthStatus = () => ({
     try {
       const response = await axiosInstance.get<IAuthStatus>(`/auth/status`)
       return response.data
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(error)
     }
   },

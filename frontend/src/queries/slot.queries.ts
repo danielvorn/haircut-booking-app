@@ -18,11 +18,11 @@ const fetchAppointmentSlotsAvailability = async ({
 
 const useAppointmentSlotsAvailability = ({
   barberId,
-  queryParamDate: date,
+  date,
   duration
 }: {
   barberId: string
-  queryParamDate: string
+  date: string
   duration: string
 }) => {
   return useQuery({

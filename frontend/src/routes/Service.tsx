@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import FakeImage from '../components/FakeImage'
 import ListComponent from '../components/ListItem'
 import LoadingSpinner from '../components/LoadingSpinner'
-import { useGetServices } from '../queries/service.queries'
+import { useGetServices, type IService } from '../queries/service.queries'
 import useAppointmentStore from '../store/useAppointmentStore'
 import { formatCurrency } from '../utils/formatCurrency'
 import { formatDuration } from '../utils/formatDuration'
@@ -11,7 +11,7 @@ export default function Service() {
   const appointment = useAppointmentStore()
   const { data: services } = useGetServices()
 
-  const renderServices = (service: typeof services): JSX.Element => {
+  const renderServices = (service: IService): JSX.Element => {
     if (!service) {
       return <LoadingSpinner />
     }
@@ -42,7 +42,7 @@ export default function Service() {
 
   return (
     <ListComponent
-      items={services}
+      items={services ?? []}
       renderListItem={renderServices}
       filterFields={{ name: 'string', price: 'number', duration: 'number' }}
     />

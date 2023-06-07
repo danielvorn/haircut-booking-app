@@ -1,10 +1,16 @@
 import type React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type SetStateAction, type Dispatch } from 'react'
 import { TbArrowsSort, TbSelector } from 'react-icons/tb'
 
 interface Option {
   value: string
-  label: string
+  label: string | JSX.Element
+}
+
+interface FilterProps<T> {
+  items: T[]
+  setFilteredItems: Dispatch<SetStateAction<Array<T | Record<string, unknown>> | undefined>>
+  filterFields: Record<string, 'string' | 'number'>
 }
 
 interface CustomSelectProps {
@@ -47,7 +53,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange })
           className="color-component-secondary relative w-48 py-2 px-3 text-left rounded-md cursor-pointer focus:outline-none sm:text-sm"
           onClick={handleToggleOpen}>
           <div className="flex items-center justify-between">
-            <span>{options.find((option) => option.value === value)?.label || ''}</span>
+            <span>{options.find((option) => option.value === value)?.label ?? ''}</span>
             <TbSelector />
           </div>
         </button>
@@ -72,12 +78,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange })
       )}
     </div>
   )
-}
-
-interface FilterProps<T> {
-  items: T[]
-  setFilteredItems: React.Dispatch<React.SetStateAction<T[]>>
-  filterFields: Record<string, 'string' | 'number'>
 }
 
 const Filter = <T extends Record<string, unknown>>({
@@ -113,7 +113,7 @@ const Filter = <T extends Record<string, unknown>>({
     }
   }
 
-  const generateOptions = () => {
+  const generateOptions = (): Option[] => {
     const options: Option[] = []
     options.push({
       value: '',
@@ -125,7 +125,7 @@ const Filter = <T extends Record<string, unknown>>({
     }) // Add the default option
 
     for (const field in filterFields) {
-      if (filterFields.hasOwnProperty(field)) {
+      if (Object.prototype.hasOwnProperty.call(filterFields, field)) {
         const type = filterFields[field]
         const capitalizedField = field.charAt(0).toUpperCase() + field.slice(1)
 

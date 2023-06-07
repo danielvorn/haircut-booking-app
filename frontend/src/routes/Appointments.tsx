@@ -1,5 +1,6 @@
+import { type FetchNextPageOptions, type InfiniteQueryObserverResult } from '@tanstack/react-query'
 import type React from 'react'
-import { forwardRef, useContext, useEffect, useMemo, useState } from 'react'
+import { forwardRef, useContext, useEffect, useMemo, useState, type MouseEventHandler } from 'react'
 import { TbArrowsSort, TbCalendar, TbClock, TbCut } from 'react-icons/tb'
 import { useInView } from 'react-intersection-observer'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -15,10 +16,9 @@ import { formatTime } from '../utils/formatTime'
 
 interface AppointmentSectionProps {
   title: string
-  icon?: React.ReactNode
+  icon?: React.ReactElement
   content: React.ReactNode
 }
-
 const AppointmentSection: React.FC<AppointmentSectionProps> = ({ title, icon, content }) => (
   <div className="flex flex-col rounded-lg color-border color-heading p-2">
     <h1>{title}</h1>
@@ -29,10 +29,31 @@ const AppointmentSection: React.FC<AppointmentSectionProps> = ({ title, icon, co
   </div>
 )
 
+type Tab = 'upcoming' | 'past'
+
+interface Service {
+  name: string
+  description: string
+  price: number
+}
+
+interface Barber {
+  name: string
+}
+
+export interface Appointment {
+  slot: {
+    startTime: string
+    endTime: string
+  }
+  service: Service
+  barber: Barber
+}
+
 interface SortButtonsProps {
   activeTab: Tab
-  sortByAscending: (sort: boolean) => void
-  sortByDescending: (sort: boolean) => void
+  sortByAscending: MouseEventHandler<HTMLButtonElement>
+  sortByDescending: MouseEventHandler<HTMLButtonElement>
 }
 
 const SortButtons: React.FC<SortButtonsProps> = ({
@@ -117,15 +138,19 @@ const AppointmentItems = forwardRef<HTMLLIElement, AppointmentItemsProps>(
 const useFetchNextPage = (
   inView: boolean,
   activeTab: Tab,
-  fetchNextPageUpcoming: () => void,
-  fetchNextPageHistory: () => void
+  fetchNextPageUpcoming: (
+    options?: FetchNextPageOptions | undefined
+  ) => Promise<InfiniteQueryObserverResult<any, unknown>>,
+  fetchNextPageHistory: (
+    options?: FetchNextPageOptions | undefined
+  ) => Promise<InfiniteQueryObserverResult<any, unknown>>
 ) => {
   useEffect(() => {
     if (inView) {
       if (activeTab === 'upcoming') {
-        fetchNextPageUpcoming()
+        void fetchNextPageHistory()
       } else if (activeTab === 'past') {
-        fetchNextPageHistory()
+        void fetchNextPageHistory()
       }
     }
   }, [inView, activeTab, fetchNextPageUpcoming, fetchNextPageHistory])
@@ -139,21 +164,17 @@ const AppointmentList: React.FC = () => {
   const {
     status: statusUpcoming,
     data: dataUpcoming,
-    error: errorUpcoming,
     isFetching: isFetchingUpcoming,
     isFetchingNextPage: isFetchingNextPageUpcoming,
-    fetchNextPage: fetchNextPageUpcoming,
-    hasNextPage: hasNextPageUpcoming
+    fetchNextPage: fetchNextPageUpcoming
   } = useGetAppointmentUpcomingQuery({ userId })
 
   const {
     status: statusHistory,
     data: dataHistory,
-    error: errorHistory,
     isFetching: isFetchingHistory,
     isFetchingNextPage: isFetchingNextPageHistory,
-    fetchNextPage: fetchNextPageHistory,
-    hasNextPage: hasNextPageHistory
+    fetchNextPage: fetchNextPageHistory
   } = useGetAppointmentHistoryQuery({ userId })
 
   const dataAppointmentsUpcoming = dataUpcoming?.pages
@@ -164,12 +185,12 @@ const AppointmentList: React.FC = () => {
     setActiveTab(tab)
   }
 
-  const flatAppointmentsUpcoming = useMemo(() => {
-    return dataAppointmentsUpcoming?.flatMap((obj) => obj.appointments)
+  const flatAppointmentsUpcoming: Appointment[] | undefined = useMemo(() => {
+    return dataAppointmentsUpcoming?.flatMap((obj) => obj.appointments) ?? []
   }, [dataAppointmentsUpcoming])
 
-  const flatAppointmentsHistory = useMemo(() => {
-    return dataAppointmentsHistory?.flatMap((obj) => obj.appointments)
+  const flatAppointmentsHistory: Appointment[] | undefined = useMemo(() => {
+    return dataAppointmentsHistory?.flatMap((obj) => obj.appointments) ?? []
   }, [dataAppointmentsHistory])
 
   const [sortedAppointmentsUpcoming, sortByAscendingUpcoming, sortByDescendingUpcoming] =

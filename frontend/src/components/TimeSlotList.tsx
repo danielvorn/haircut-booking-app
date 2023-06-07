@@ -1,7 +1,7 @@
 import type React from 'react'
 import { TbClock } from 'react-icons/tb'
 import { useLoaderData } from 'react-router-dom'
-import useAppointmentStore, { type AppointmentState } from '../useAppointmentStore'
+import useAppointmentStore from '../store/useAppointmentStore'
 
 interface TimeSlot {
   startTime: string
@@ -11,7 +11,7 @@ interface TimeSlot {
 
 const TimeSlotsList: React.FC = () => {
   const timeSlots = useLoaderData() as TimeSlot[]
-  const appointment = useAppointmentStore() as AppointmentState
+  const appointment = useAppointmentStore()
   const { service } = appointment
 
   const getFilteredSlots = (startHour: number, endHour: number) => {
@@ -33,7 +33,7 @@ const TimeSlotsList: React.FC = () => {
       <div
         key={index}
         className={`color-border color-hover cursor-pointer slot-item ${period}-slot text-sm p-2 rounded-lg ${
-          slot.isReserved ? 'reserved-slot' : ''
+          slot.isAvailable ? 'reserved-slot' : ''
         }`}
         onClick={() => {
           appointment.setSlot({

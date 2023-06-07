@@ -22,15 +22,9 @@ const Review: React.FC = () => {
   const userId = authStatus.data?.userId
   const isAuthenticated = authStatus?.isAuthenticated
   const navigate = useNavigate()
-  const { barber, date, service, slot, setIsBookingPending, reset } = appointment
+  const { barber, date, service, slot, setIsBookingPending } = appointment
 
-  const {
-    mutate: bookAppointment,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  } = useBookAppointmentMutation()
+  const { mutate: bookAppointment, isLoading } = useBookAppointmentMutation()
 
   const handleBookAppointment = () => {
     try {
@@ -77,7 +71,7 @@ const Review: React.FC = () => {
                 </span>
               )}
               <span className="flex items-center font-light space-x-2 color-paragraph">
-                <span className="text-primary">{new Date(date).toDateString()}</span>
+                <span className="text-primary">{new Date(date as string).toDateString()}</span>
               </span>
             </div>
           </div>
