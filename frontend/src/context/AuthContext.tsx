@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import type React from 'react'
 import { createContext, type PropsWithChildren } from 'react'
 import axiosInstance from '../utils/api'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 interface AuthState {
   isAuthenticated: boolean
@@ -64,7 +65,11 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   })
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <LoadingSpinner />
+  }
+
+  if (authStatus) {
+    return <LoadingSpinner />
   }
 
   if (isError) {

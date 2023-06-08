@@ -19,8 +19,9 @@ const useLoginMutation = () => {
       await queryClient.invalidateQueries({ queryKey: ['authStatus'] })
       if (isBookingPending) {
         navigate('/review')
+      } else {
+        navigate('/')
       }
-      navigate('/')
     }
   })
 }

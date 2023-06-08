@@ -28,8 +28,8 @@ const useBookAppointmentMutation = () => {
 
   return useMutation({
     mutationFn: bookAppointment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['appointments', userId, 'upcoming']
       })
       navigate('/appointments')

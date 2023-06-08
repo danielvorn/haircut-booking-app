@@ -5,6 +5,7 @@ import useAppointmentStore from '../store/useAppointmentStore'
 const Redirect = () => {
   const navigate = useNavigate()
   const { isBookingPending } = useAppointmentStore()
+
   useEffect(() => {
     if (isBookingPending) {
       navigate('/review')
