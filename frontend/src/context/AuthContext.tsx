@@ -68,10 +68,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     return <LoadingSpinner />
   }
 
-  if (authStatus) {
-    return <LoadingSpinner />
-  }
-
   if (isError) {
     return <div>Error occurred while fetching auth status.</div>
   }
