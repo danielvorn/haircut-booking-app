@@ -193,8 +193,11 @@ const getAvailability = async (req: Request, res: Response) => {
 
     // Parse the date query parameter in ISO 8601 format
     const date = new Date(dateParam)
-    const startTime = new Date(date.setUTCHours(9, 0, 0, 0)) // Set start time to 9AM
-    const endTime = new Date(date.setUTCHours(17, 0, 0, 0)) // Set end time to 5PM
+
+    const startTime = new Date(date.getTime())
+    startTime.setUTCHours(2, 0, 0, 0) // Set start time to 9AM in UTC
+    const endTime = new Date(date.getTime())
+    endTime.setUTCHours(10, 0, 0, 0) // Set end time to 5PM in UTC
 
     const timeSlots = []
     let currentTime = startTime.getTime()
