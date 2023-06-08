@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import mongoose from "mongoose"
 import { Appointment, ISlot } from "../models/appointment.model"
 import { Barber } from "../models/barber.model"
+import dayjs from "dayjs"
 
 const createAppointment = async (req: Request, res: Response) => {
   try {
@@ -118,40 +119,6 @@ const getAppointmentsByClientId = async (req: Request, res: Response) => {
   }
 }
 
-// const getAppointmentsByClientId = async (req: Request, res: Response) => {
-//   try {
-//     const clientId = req.params.client as string
-//     if (!clientId) {
-//       return res.status(400).json({ error: "Client ID is required" })
-//     }
-
-//     const time = req.query.time as string
-//     if (!time || (time !== "upcoming" && time !== "history")) {
-//       return res.status(400).json({
-//         error:
-//           "Please specify a query param of 'time' with value 'upcoming' or 'history'",
-//       })
-//     }
-
-//     const filter: any = { client: clientId }
-
-//     if (time === "upcoming") {
-//       filter["slot.startTime"] = { $gt: new Date().toISOString() }
-//     } else if (time === "history") {
-//       filter["slot.endTime"] = { $lt: new Date().toISOString() }
-//     }
-
-//     const appointments = await Appointment.find(filter)
-//       .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
-//       .populate("barber", "name")
-//       .populate("service", ["name", "description", "price", "duration"])
-
-//     res.json(appointments)
-//   } catch (error) {
-//     res.status(400).json(error)
-//   }
-// }
-
 const getAllAppointments = async (req: Request, res: Response) => {
   try {
     const appointments = await Appointment.find()
@@ -209,9 +176,9 @@ const deleteAppointmentById = async (req: Request, res: Response) => {
 
 const getAvailability = async (req: Request, res: Response) => {
   try {
-    const barberId = req.query.barberId as string // Assuming the barber ID is passed as a query parameter
-    const dateParam = req.query.date as string // Assuming the date is passed as a query parameter
-    const durationMinutes = Number(req.query.duration) // Assuming the duration is passed in minutes
+    const barberId = req.query.barberId as string
+    const dateParam = req.query.date as string
+    const durationMinutes = Number(req.query.duration)
 
     if (!barberId || !dateParam || isNaN(durationMinutes)) {
       return res.status(400).json({ error: "Invalid query parameters" })
@@ -222,43 +189,41 @@ const getAvailability = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Barber not found" })
     }
 
-    // Find all reserved slots for the barber
     const reservedSlots = await Appointment.find({ barber: barberId }, "slot")
 
-    // Parse the date query parameter in ISO 8601 format
-    const date = new Date(dateParam)
-    const startTime = new Date(date.setHours(9, 0, 0, 0)) // Set start time to 9AM
-    const endTime = new Date(date.setHours(17, 0, 0, 0)) // Set end time to 5PM
+    const date = dayjs(dateParam)
+    const startTime = date.set("hour", 9).set("minute", 0).set("second", 0)
+    const endTime = date.set("hour", 17).set("minute", 0).set("second", 0)
 
     const timeSlots = []
-    let currentTime = startTime.getTime()
-    const today = new Date()
+    let currentTime = startTime.valueOf()
+    const today = dayjs()
     while (true) {
-      const slotEndTime = new Date(currentTime + durationMinutes * 60000)
+      const slotEndTime = dayjs(currentTime).add(durationMinutes, "minute")
 
-      if (slotEndTime.getTime() > endTime.getTime()) {
-        break // Stop generating time slots if the next slot would exceed endTime
+      if (slotEndTime.valueOf() > endTime.valueOf()) {
+        break
       }
 
       const isReserved = reservedSlots.some((appointment: any) =>
-        isTimeSlotOverlap(currentTime, slotEndTime.getTime(), appointment.slot)
+        isTimeSlotOverlap(currentTime, slotEndTime.valueOf(), appointment.slot)
       )
 
       const timeSlot = {
-        startTime: new Date(currentTime),
-        endTime: slotEndTime,
+        startTime: dayjs(currentTime).toDate(),
+        endTime: slotEndTime.toDate(),
         isAvailable: !isReserved,
       }
 
       if (
-        date.toDateString() === today.toDateString() &&
-        today.getTime() > new Date(currentTime).getTime()
+        date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD") &&
+        today.valueOf() > dayjs(currentTime).valueOf()
       ) {
-        timeSlot.isAvailable = false // Set isAvailable to false for slots that have elapsed today
+        timeSlot.isAvailable = false
       }
 
       timeSlots.push(timeSlot)
-      currentTime += 15 * 60 * 1000 // Move to the next time slot (15 minutes)
+      currentTime += 15 * 60 * 1000
     }
 
     res.json(timeSlots)
@@ -267,14 +232,13 @@ const getAvailability = async (req: Request, res: Response) => {
   }
 }
 
-// Function to check if a time slot overlaps with a given appointment slot
 function isTimeSlotOverlap(
   startTime: number,
   endTime: number,
   appointmentSlot: ISlot
 ) {
-  const slotStartTime = new Date(appointmentSlot.startTime).getTime()
-  const slotEndTime = new Date(appointmentSlot.endTime).getTime()
+  const slotStartTime = dayjs(appointmentSlot.startTime).valueOf()
+  const slotEndTime = dayjs(appointmentSlot.endTime).valueOf()
 
   return startTime < slotEndTime && endTime > slotStartTime
 }
