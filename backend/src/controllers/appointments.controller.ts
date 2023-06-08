@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import mongoose from "mongoose"
 import { Appointment, ISlot } from "../models/appointment.model"
 import { Barber } from "../models/barber.model"
-import dayjs from "dayjs"
 
 const createAppointment = async (req: Request, res: Response) => {
   try {
@@ -176,9 +175,9 @@ const deleteAppointmentById = async (req: Request, res: Response) => {
 
 const getAvailability = async (req: Request, res: Response) => {
   try {
-    const barberId = req.query.barberId as string
-    const dateParam = req.query.date as string
-    const durationMinutes = Number(req.query.duration)
+    const barberId = req.query.barberId as string // Assuming the barber ID is passed as a query parameter
+    const dateParam = req.query.date as string // Assuming the date is passed as a query parameter
+    const durationMinutes = Number(req.query.duration) // Assuming the duration is passed in minutes
 
     if (!barberId || !dateParam || isNaN(durationMinutes)) {
       return res.status(400).json({ error: "Invalid query parameters" })
@@ -189,41 +188,43 @@ const getAvailability = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Barber not found" })
     }
 
+    // Find all reserved slots for the barber
     const reservedSlots = await Appointment.find({ barber: barberId }, "slot")
 
-    const date = dayjs(dateParam)
-    const startTime = date.set("hour", 9).set("minute", 0).set("second", 0)
-    const endTime = date.set("hour", 17).set("minute", 0).set("second", 0)
+    // Parse the date query parameter in ISO 8601 format
+    const date = new Date(dateParam)
+    const startTime = new Date(date.setHours(9, 0, 0, 0)) // Set start time to 9AM
+    const endTime = new Date(date.setHours(17, 0, 0, 0)) // Set end time to 5PM
 
     const timeSlots = []
-    let currentTime = startTime.valueOf()
-    const today = dayjs()
+    let currentTime = startTime.getTime()
+    const today = new Date()
     while (true) {
-      const slotEndTime = dayjs(currentTime).add(durationMinutes, "minute")
+      const slotEndTime = new Date(currentTime + durationMinutes * 60000)
 
-      if (slotEndTime.valueOf() > endTime.valueOf()) {
-        break
+      if (slotEndTime.getTime() > endTime.getTime()) {
+        break // Stop generating time slots if the next slot would exceed endTime
       }
 
       const isReserved = reservedSlots.some((appointment: any) =>
-        isTimeSlotOverlap(currentTime, slotEndTime.valueOf(), appointment.slot)
+        isTimeSlotOverlap(currentTime, slotEndTime.getTime(), appointment.slot)
       )
 
       const timeSlot = {
-        startTime: dayjs(currentTime).toDate(),
-        endTime: slotEndTime.toDate(),
+        startTime: new Date(currentTime).toISOString(), // Convert to ISO string
+        endTime: slotEndTime.toISOString(), // Convert to ISO string
         isAvailable: !isReserved,
       }
 
       if (
-        date.format("YYYY-MM-DD") === today.format("YYYY-MM-DD") &&
-        today.valueOf() > dayjs(currentTime).valueOf()
+        date.toDateString() === today.toDateString() &&
+        today.getTime() > new Date(currentTime).getTime()
       ) {
-        timeSlot.isAvailable = false
+        timeSlot.isAvailable = false // Set isAvailable to false for slots that have elapsed today
       }
 
       timeSlots.push(timeSlot)
-      currentTime += 15 * 60 * 1000
+      currentTime += 15 * 60 * 1000 // Move to the next time slot (15 minutes)
     }
 
     res.json(timeSlots)
@@ -232,13 +233,14 @@ const getAvailability = async (req: Request, res: Response) => {
   }
 }
 
+// Function to check if a time slot overlaps with a given appointment slot
 function isTimeSlotOverlap(
   startTime: number,
   endTime: number,
   appointmentSlot: ISlot
 ) {
-  const slotStartTime = dayjs(appointmentSlot.startTime).valueOf()
-  const slotEndTime = dayjs(appointmentSlot.endTime).valueOf()
+  const slotStartTime = new Date(appointmentSlot.startTime).getTime()
+  const slotEndTime = new Date(appointmentSlot.endTime).getTime()
 
   return startTime < slotEndTime && endTime > slotStartTime
 }
