@@ -195,9 +195,9 @@ const getAvailability = async (req: Request, res: Response) => {
     const date = new Date(dateParam)
 
     const startTime = new Date(date.getTime())
-    startTime.setHours(2, 0, 0, 0) // Set start time to 9AM in UTC
+    date.setUTCHours(14, 0, 0, 0); // Convert date to 9 AM EST (UTC+9)
     const endTime = new Date(date.getTime())
-    endTime.setHours(10, 0, 0, 0) // Set end time to 5PM in UTC
+    endTime.setUTCHours(22, 0, 0, 0); // Convert date to 5 PM EST (UTC+9)
 
     const timeSlots = []
     let currentTime = startTime.getTime()
